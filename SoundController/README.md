@@ -1,4 +1,6 @@
-# 🎵## ✨ Features
+# Arduino Nano DFPlayer Mini Sound Controller
+
+## ✨ Features
 
 - 🎶 MP3 playback with DFPlayer Mini
 - 🎲 Random track playback via single button click
