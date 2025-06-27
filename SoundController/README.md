@@ -8,20 +8,11 @@
 - 🔘 **Standalone operation** - works without I2C
 - 📡 **Optional I2C addon** for external control
 - 🔊 Volume control and full playback management
-- 🎯 Support for 5 audio tracksntroller
+- 🎯 Support for 5 audio tracks
 
 Arduino Nano based sound controller with DFPlayer Mini MP3 module. Works standalone with physical buttons, with **optional** I2C communication for external control.
 
-## ✨ Features
-
-- 🎶 MP3 playback with DFPlayer Mini
-- 🎲 Random track playback via button press
-- � **Standalone operation** - works without I2C
-- 📡 **Optional I2C addon** for external control
-- 🔊 Volume control and full playback management
-- 🎯 Support for 5 audio tracks
-
-## 🔧 Hardware
+##  Hardware
 
 **Required Components:**
 - 🔌 Arduino Nano
