@@ -4,34 +4,34 @@
 
 ```mermaid
 flowchart TD
-    A[🚀 START - setup()] --> B[📊 Initialize Serial 9600 baud]
-    B --> C[🎵 Initialize DFPlayer Mini]
+    A[START - setup] --> B[Initialize Serial 9600 baud]
+    B --> C[Initialize DFPlayer Mini]
     C --> D{DFPlayer found?}
-    D -->|❌ No| E[💥 ERROR: DFPlayer not found]
-    E --> F[⏹️ STOP - Endless loop]
-    D -->|✅ Yes| G[🔊 Set volume]
-    G --> H[📌 Configure input pins]
-    H --> I[📡 Initialize I2C slave]
-    I --> J[✅ Setup complete]
-    J --> K[🔄 MAIN LOOP - loop()]
+    D -->|No| E[ERROR: DFPlayer not found]
+    E --> F[STOP - Endless loop]
+    D -->|Yes| G[Set volume]
+    G --> H[Configure input pins]
+    H --> I[Initialize I2C slave]
+    I --> J[Setup complete]
+    J --> K[MAIN LOOP - loop]
     
-    K --> L[🔘 Check button status]
+    K --> L[Check button status]
     L --> M{Button pressed?}
-    M -->|❌ No| N[⏰ Check double-click timeout]
-    M -->|✅ Yes| O[📝 Increment click counter]
+    M -->|No| N[Check double-click timeout]
+    M -->|Yes| O[Increment click counter]
     
     O --> P{First click?}
-    P -->|✅ Yes| Q[⏳ Wait for second click]
-    P -->|❌ No| R{Second click in time?}
+    P -->|Yes| Q[Wait for second click]
+    P -->|No| R{Second click in time?}
     
-    R -->|✅ Yes| S[⏹️ DOUBLE CLICK - Stop track]
-    R -->|❌ No| T[🎲 SINGLE CLICK - Random track]
+    R -->|Yes| S[DOUBLE CLICK - Stop track]
+    R -->|No| T[SINGLE CLICK - Random track]
     
     N --> U{Timeout reached?}
-    U -->|✅ Yes| T
-    U -->|❌ No| V[⏱️ Wait 10ms]
+    U -->|Yes| T
+    U -->|No| V[Wait 10ms]
     
-    S --> W[🧹 Reset click counter]
+    S --> W[Reset click counter]
     T --> W
     Q --> V
     W --> V
@@ -48,22 +48,22 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[📡 I2C Interrupt - receiveEvent()] --> B{Data available?}
-    B -->|❌ No| C[⚠️ WARNING: No data]
-    B -->|✅ Yes| D[📥 Read command byte]
+    A[I2C Interrupt - receiveEvent] --> B{Data available?}
+    B -->|No| C[WARNING: No data]
+    B -->|Yes| D[Read command byte]
     
     D --> E{Command = ?}
     
-    E -->|1| F[🎲 Play random track]
-    E -->|2| G[⏹️ Stop playback]
-    E -->|3| H[⏸️ Pause playback]
-    E -->|4| I[▶️ Resume playback]
-    E -->|5| J[🔊 Volume up]
-    E -->|6| K[🔉 Volume down]
-    E -->|10-14| L[🎯 Play specific track]
-    E -->|other| M[❓ Unknown command]
+    E -->|1| F[Play random track]
+    E -->|2| G[Stop playback]
+    E -->|3| H[Pause playback]
+    E -->|4| I[Resume playback]
+    E -->|5| J[Volume up]
+    E -->|6| K[Volume down]
+    E -->|10-14| L[Play specific track]
+    E -->|other| M[Unknown command]
     
-    F --> N[🧹 Clear buffer]
+    F --> N[Clear buffer]
     G --> N
     H --> N
     I --> N
@@ -73,7 +73,7 @@ flowchart TD
     M --> N
     C --> N
     
-    N --> O[🔚 Interrupt end]
+    N --> O[Interrupt end]
     
     style A fill:#9C27B0,stroke:#6A1B9A,color:#fff
     style M fill:#FF5722,stroke:#D84315,color:#fff
@@ -84,13 +84,13 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A[🎵 DFPlayer Functions] --> B[🎲 playRandomTrack()]
-    A --> C[⏹️ stopCurrentTrack()]
+    A[DFPlayer Functions] --> B[playRandomTrack]
+    A --> C[stopCurrentTrack]
     
-    B --> D[🎯 Select random track 1-5]
-    D --> E[🎵 speaker.play(trackNumber)]
+    B --> D[Select random track 1-5]
+    D --> E[speaker.play trackNumber]
     
-    C --> F[🛑 speaker.stop()]
+    C --> F[speaker.stop]
     
     style A fill:#4CAF50,stroke:#2E7D32,color:#fff
     style E fill:#2196F3,stroke:#1565C0,color:#fff
