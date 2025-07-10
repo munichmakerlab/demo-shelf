@@ -4,6 +4,21 @@
 #include <Wire.h>
 
 // ========================================
+// DEBUG CONFIGURATION
+// ========================================
+#define DEBUG false  // Set to false to disable all serial output
+
+#if DEBUG
+  #define DEBUG_PRINT(x) Serial.print(x)
+  #define DEBUG_PRINTLN(x) Serial.println(x)
+  #define DEBUG_BEGIN(x) Serial.begin(x)
+#else
+  #define DEBUG_PRINT(x)
+  #define DEBUG_PRINTLN(x)
+  #define DEBUG_BEGIN(x)
+#endif
+
+// ========================================
 // PIN DEFINITIONS
 // ========================================
 #define INPUT_PIN_PLAY_RANDOM_TRACK 5
@@ -18,8 +33,9 @@
 // CONFIGURATION
 // ========================================
 #define DFPLAYER_BAUD_RATE 9600 
-#define DFPLAYER_VOLUME 5       // Volume level (0-30)
-#define SOUND_TRACK_COUNT 5     // Number of available tracks
+#define DFPLAYER_VOLUME 15      // Volume level (0-30)
+#define DFPLAYER_START_SOUND 1  // Start sound track number (1-based index)
+#define SOUND_TRACK_COUNT 6     // Number of available tracks
 #define DEBOUNCE_DELAY 50       // Button debounce delay in ms
 #define DOUBLE_CLICK_DELAY 300  // Maximum time between clicks for double-click (ms)
 #define I2C_SLAVE_ADDRESS 0x08  // I2C slave address
@@ -31,7 +47,7 @@ SoftwareSerial softSerial(DFPLAYER_RX, DFPLAYER_TX);
 DFRobotDFPlayerMini speaker;
 
 // Button handling
-uint8_t lastButtonState = HIGH; 
+uint8_t lastButtonState = LOW; 
 uint32_t lastDebounceTime = 0;  // Changed from uint64_t to uint32_t
 uint32_t lastClickTime = 0;     // Time of last button click
 uint8_t clickCount = 0;         // Number of clicks detected
@@ -52,36 +68,36 @@ void stopCurrentTrack();
 // SETUP FUNCTION
 // ========================================
 void setup() {
-  Serial.begin(9600);
+  DEBUG_BEGIN(9600);
   
   // Project header
-  Serial.println("");
-  Serial.println("========================================");
-  Serial.println("         🎵 SOUND CONTROLLER 🎵        ");
-  Serial.println("========================================");
-  Serial.println("Arduino Nano MP3 Player & Controller");
-  Serial.println("- DFPlayer Mini Integration");
-  Serial.println("- Single/Double Click Control");
-  Serial.println("- Optional I2C Remote Control");
-  Serial.print("- ");
-  Serial.print(SOUND_TRACK_COUNT);
-  Serial.println(" Track Support");
-  Serial.print("- I2C Address: 0x");
-  Serial.println(I2C_SLAVE_ADDRESS, HEX);
-  Serial.print("- DFPlayer Volume: ");
-  Serial.println(DFPLAYER_VOLUME);
-  Serial.print("- Trigger Pin: ");
-  Serial.println(INPUT_PIN_PLAY_RANDOM_TRACK);
-  Serial.println("========================================");
-  Serial.println("");
+  DEBUG_PRINTLN("");
+  DEBUG_PRINTLN("========================================");
+  DEBUG_PRINTLN("         🎵 SOUND CONTROLLER 🎵        ");
+  DEBUG_PRINTLN("========================================");
+  DEBUG_PRINTLN("Arduino Nano MP3 Player & Controller");
+  DEBUG_PRINTLN("- DFPlayer Mini Integration");
+  DEBUG_PRINTLN("- Single/Double Click Control");
+  DEBUG_PRINTLN("- Optional I2C Remote Control");
+  DEBUG_PRINT("- ");
+  DEBUG_PRINT(SOUND_TRACK_COUNT);
+  DEBUG_PRINTLN(" Track Support");
+  DEBUG_PRINT("- I2C Address: 0x");
+  DEBUG_PRINTLN(I2C_SLAVE_ADDRESS);
+  DEBUG_PRINT("- DFPlayer Volume: ");
+  DEBUG_PRINTLN(DFPLAYER_VOLUME);
+  DEBUG_PRINT("- Trigger Pin: ");
+  DEBUG_PRINTLN(INPUT_PIN_PLAY_RANDOM_TRACK);
+  DEBUG_PRINTLN("========================================");
+  DEBUG_PRINTLN("");
   
-  Serial.println("[INFO] === SoundController Starting ===");
+  DEBUG_PRINTLN("[INFO] === SoundController Starting ===");
 
   initializeDFPlayer();
   initializeInputs();
   initializeI2C();
 
-  Serial.println("[INFO] Setup complete. Ready for input!");
+  DEBUG_PRINTLN("[INFO] Setup complete. Ready for input!");
 }
 
 // ========================================
@@ -93,7 +109,7 @@ void loop() {
   // Check for double-click timeout
   if (waitingForSecondClick && (millis() - lastClickTime) > DOUBLE_CLICK_DELAY) {
     // Single click detected - play random track
-    Serial.println("[DEBUG] Single click - playing random track...");
+    DEBUG_PRINTLN("[DEBUG] Single click - playing random track...");
     playRandomTrack();
     waitingForSecondClick = false;
     clickCount = 0;
@@ -106,13 +122,13 @@ void loop() {
 // INITIALIZATION FUNCTIONS
 // ========================================
 void initializeDFPlayer() {
-  Serial.println("[INFO] Initializing DFPlayer Mini...");
+  DEBUG_PRINTLN("[INFO] Initializing DFPlayer Mini...");
   
   softSerial.begin(DFPLAYER_BAUD_RATE);
   
   if (!speaker.begin(softSerial, true, false)) {
-    Serial.println("[ERROR] DFPlayer Mini not found!");
-    Serial.println("[ERROR] Check connections and restart.");
+    DEBUG_PRINTLN("[ERROR] DFPlayer Mini not found!");
+    DEBUG_PRINTLN("[ERROR] Check connections and restart.");
     while (true) {
       delay(1000); // Stay in error state
     }
@@ -120,28 +136,31 @@ void initializeDFPlayer() {
   
   speaker.volume(DFPLAYER_VOLUME);
   delay(100); // Give DFPlayer time to process
-  Serial.println("[INFO] DFPlayer Mini ready.");
+  DEBUG_PRINTLN("[INFO] DFPlayer Mini ready.");
+
+  // Play the start sound
+  speaker.play(DFPLAYER_START_SOUND);
 }
 
 void initializeInputs() {
-  Serial.println("[INFO] Setting up input pins...");
+  DEBUG_PRINTLN("[INFO] Setting up input pins...");
   
   pinMode(INPUT_PIN_PLAY_RANDOM_TRACK, INPUT_PULLUP);
   pinMode(INPUT_PIN_1, INPUT_PULLUP);
   pinMode(INPUT_PIN_2, INPUT_PULLUP);
   pinMode(INPUT_PIN_3, INPUT_PULLUP);
   
-  Serial.println("[INFO] Input pins configured.");
+  DEBUG_PRINTLN("[INFO] Input pins configured.");
 }
 
 void initializeI2C() {
-  Serial.println("[INFO] Initializing I2C interface...");
+  DEBUG_PRINTLN("[INFO] Initializing I2C interface...");
   
   Wire.begin(I2C_SLAVE_ADDRESS);
   Wire.onReceive(receiveEvent);
   
-  Serial.print("[INFO] I2C slave ready at address: 0x");
-  Serial.println(I2C_SLAVE_ADDRESS, HEX);
+  DEBUG_PRINT("[INFO] I2C slave ready at address: 0x");
+  DEBUG_PRINTLN(I2C_SLAVE_ADDRESS);
 }
 
 // ========================================
@@ -162,12 +181,12 @@ void handleButtonInput() {
       // First click detected
       lastClickTime = currentTime;
       waitingForSecondClick = true;
-      Serial.println("[DEBUG] First click detected, waiting for second...");
+      DEBUG_PRINTLN("[DEBUG] First click detected, waiting for second...");
       
     } else if (clickCount == 2 && waitingForSecondClick && 
                (currentTime - lastClickTime) <= DOUBLE_CLICK_DELAY) {
       // Double click detected
-      Serial.println("[DEBUG] Double click - stopping current track...");
+      DEBUG_PRINTLN("[DEBUG] Double click - stopping current track...");
       stopCurrentTrack();
       waitingForSecondClick = false;
       clickCount = 0;
@@ -182,14 +201,15 @@ void handleButtonInput() {
 }
 
 void playRandomTrack() {
-  uint8_t trackNumber = random(1, SOUND_TRACK_COUNT + 1);
-  Serial.print("[INFO] Playing track: ");
-  Serial.println(trackNumber);
+  uint8_t trackNumber = random(2, SOUND_TRACK_COUNT + 1);
+
+  DEBUG_PRINT("[INFO] Playing track: ");
+  DEBUG_PRINTLN(trackNumber);
   speaker.play(trackNumber);
 }
 
 void stopCurrentTrack() {
-  Serial.println("[INFO] Stopping current track...");
+  DEBUG_PRINTLN("[INFO] Stopping current track...");
   speaker.stop();
 }
 
@@ -200,42 +220,42 @@ void stopCurrentTrack() {
 void receiveEvent(int bytes) {
   // Safety check: ensure data is available
   if (!Wire.available()) {
-    Serial.println("[WARN] I2C: No data received");
+    DEBUG_PRINTLN("[WARN] I2C: No data received");
     return;
   }
 
   uint8_t command = Wire.read();
-  Serial.print("[DEBUG] I2C command received: ");
-  Serial.println(command);
+  DEBUG_PRINT("[DEBUG] I2C command received: ");
+  DEBUG_PRINTLN(command);
   
   switch (command) {
     case 1: // Play random track
-      Serial.println("[INFO] I2C: Playing random track");
+      DEBUG_PRINTLN("[INFO] I2C: Playing random track");
       playRandomTrack();
       break;
       
     case 2: // Stop playback
-      Serial.println("[INFO] I2C: Stopping playback");
+      DEBUG_PRINTLN("[INFO] I2C: Stopping playback");
       speaker.stop();
       break;
       
     case 3: // Pause playback
-      Serial.println("[INFO] I2C: Pausing playback");
+      DEBUG_PRINTLN("[INFO] I2C: Pausing playback");
       speaker.pause();
       break;
       
     case 4: // Resume playback
-      Serial.println("[INFO] I2C: Resuming playback");
+      DEBUG_PRINTLN("[INFO] I2C: Resuming playback");
       speaker.start();
       break;
       
     case 5: // Volume up
-      Serial.println("[INFO] I2C: Volume up");
+      DEBUG_PRINTLN("[INFO] I2C: Volume up");
       speaker.volumeUp();
       break;
       
     case 6: // Volume down
-      Serial.println("[INFO] I2C: Volume down");
+      DEBUG_PRINTLN("[INFO] I2C: Volume down");
       speaker.volumeDown();
       break;
       
@@ -243,12 +263,12 @@ void receiveEvent(int bytes) {
       // Handle specific track commands (10-14)
       if (command >= 10 && command <= (9 + SOUND_TRACK_COUNT)) {
         uint8_t track = command - 9;
-        Serial.print("[INFO] I2C: Playing specific track ");
-        Serial.println(track);
+        DEBUG_PRINT("[INFO] I2C: Playing specific track ");
+        DEBUG_PRINTLN(track);
         speaker.play(track);
       } else {
-        Serial.print("[WARN] I2C: Unknown command ");
-        Serial.println(command);
+        DEBUG_PRINT("[WARN] I2C: Unknown command ");
+        DEBUG_PRINTLN(command);
       }
       break;
   }
