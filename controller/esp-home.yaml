@@ -47,6 +47,7 @@ switch:
     pin: D2
     id: relay2
     inverted: true
+    restore_mode: ALWAYS_ON
   - platform: gpio
     name: "Relay 5V action line"
     pin: D5
@@ -57,35 +58,31 @@ switch:
     pin: D6
     id: relay4
     inverted: true
-    
-  - platform: template
-    name: "Music Play"
-    id: music_play
-    assumed_state: false
-    on_press:
-      - switch.turn_on: music_trigger_gpio
-      - delay: 200ms
-      - switch.turn_off: music_trigger_gpio
 
-  - platform: template
-    name: "Music Stop"
-    id: music_stop
-    assumed_state: false
-    on_press:
-      - switch.turn_on: music_trigger_gpio
-      - delay: 100ms
-      - switch.turn_off: music_trigger_gpio
-      - delay: 100ms
-      - switch.turn_on: music_trigger_gpio
-      - delay: 100ms
-      - switch.turn_off: music_trigger_gpio
-
+output:
   - platform: gpio
     id: music_trigger_gpio
     pin: D8
-    restore_mode: ALWAYS_OFF
     inverted: false
-    internal: true
+
+button:
+  - platform: template
+    name: "Music Play"
+    on_press:
+      - output.turn_on: music_trigger_gpio
+      - delay: 200ms
+      - output.turn_off: music_trigger_gpio
+
+  - platform: template
+    name: "Music Stop"
+    on_press:
+      - output.turn_on: music_trigger_gpio
+      - delay: 100ms
+      - output.turn_off: music_trigger_gpio
+      - delay: 100ms
+      - output.turn_on: music_trigger_gpio
+      - delay: 100ms
+      - output.turn_off: music_trigger_gpio
 
 binary_sensor:
   - platform: gpio
