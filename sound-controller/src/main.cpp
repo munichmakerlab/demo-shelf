@@ -33,7 +33,7 @@
 // CONFIGURATION
 // ========================================
 #define DFPLAYER_BAUD_RATE 9600 
-#define DFPLAYER_VOLUME 15      // Volume level (0-30)
+#define DFPLAYER_VOLUME 25      // Volume level (0-30)
 #define DFPLAYER_START_SOUND 1  // Start sound track number (1-based index)
 #define SOUND_TRACK_COUNT 6     // Number of available tracks
 #define DEBOUNCE_DELAY 50       // Button debounce delay in ms
@@ -90,7 +90,8 @@ void setup() {
   DEBUG_PRINTLN(INPUT_PIN_PLAY_RANDOM_TRACK);
   DEBUG_PRINTLN("========================================");
   DEBUG_PRINTLN("");
-  
+  DEBUG_PRINTLN("Wait for external sound controller to startup (delay 5 seconds)..."); 
+  delay(5000);
   DEBUG_PRINTLN("[INFO] === SoundController Starting ===");
 
   initializeDFPlayer();
